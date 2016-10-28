@@ -1,0 +1,13 @@
+[package]
+name = "ffirst"
+version = "0.1.0"
+authors = ["Tupshin Harper <tupshin@tupshin.com>"]
+
+[dependencies]
+
+
+[lib]
+name = "sack"
+
+[[bin]]
+name="test"
