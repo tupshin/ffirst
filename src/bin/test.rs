@@ -1,9 +1,6 @@
 extern crate sack;
 
-use sack::SackBacker;
 use sack::data_store::kv_store::{KVSack, WriteableKVSack};
-use std::collections::BTreeMap;
-use std::fmt::Debug;
 
 fn main() {
     let mut s: KVSack<i32, i32> = KVSack::default();

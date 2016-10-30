@@ -1,11 +1,9 @@
 use particle::decay::decay::Decayer;
-use sack::{SackLike, SackStorable, SackBacker, TokenLike};
+use sack::{SackType, SackStorable, SackBacker, TokenLike};
 
-pub trait Emitter<'a, S1: 'a, S2: 'a, C1: 'a, C2: 'a, D1: 'a, D2: 'a, B1: 'a, B2: 'a, T1: 'a, T2: 'a>
-    : Decayer<'a, S1, S1, S2, C1, C1, C2, D1, D1, D2, B1, B1, B2, T1, T1, T2>
-    where S1: SackLike<'a, C1, D1, B1>,
-          S2: SackLike<'a, C2, D2, B2>,
-          C1: SackStorable,
+pub trait Emitter<'a, C1: 'a, C2: 'a, D1: 'a, D2: 'a, B1: 'a, B2: 'a, T1: 'a, T2: 'a>
+    : Decayer<'a, C1, C1, C2, D1, D1, D2, B1, B1, B2, T1, T1, T2>
+    where C1: SackStorable,
           C2: SackStorable,
           D1: SackStorable,
           D2: SackStorable,
@@ -14,7 +12,7 @@ pub trait Emitter<'a, S1: 'a, S2: 'a, C1: 'a, C2: 'a, D1: 'a, D2: 'a, B1: 'a, B2
           T1: TokenLike,
           T2: TokenLike
 {
-    fn emit(s1: &'a S1) -> (&'a S1, &'a S2);
+    fn emit(s1: &'a SackType<C1, D1, B1>) -> (&'a SackType<C1, D1, B1>, &'a SackType<C2, D2, B2>);
 }
 
 // impl<S1, S2, C1, C2, D1, D2, B1, B2, T1, T2> Emitter<S1, S2, C1, C2, D1, D2, B1, B2, T1, T2> for S1
