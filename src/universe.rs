@@ -19,13 +19,17 @@ impl<C, D, T> SackBacker for BTreeBackedSack<C, D, T>
 {
 }
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub struct BTreeBackedSack<C, D, T> {
     t: T,
     b: BTreeMap<C, D>,
 }
 
-impl<C,T> SackLike<C,(),C> for BTreeBackedSack<C,(),T> where C:SackBacker,T:TokenLike{}
+impl<'a, C: 'a, T: 'a> SackLike<'a, C, (), C> for BTreeBackedSack<C, (), T>
+    where C: SackBacker,
+          T: TokenLike
+{
+}
 
 
 
@@ -38,7 +42,7 @@ impl<C,T> SackLike<C,(),C> for BTreeBackedSack<C,(),T> where C:SackBacker,T:Toke
 //    _phantom: PhantomData<(C, D)>,
 // }
 
-impl<C, D, T> SackLike<C, D, BTreeBackedSack<C, D,T>> for BTreeBackedSack<C, D, T>
+impl<'a, C: 'a, D: 'a, T: 'a> SackLike<'a, C, D, BTreeBackedSack<C, D, T>> for BTreeBackedSack<C, D, T>
     where C: SackStorable,
           D: SackStorable,
           T: TokenLike + SackStorable
@@ -46,11 +50,10 @@ impl<C, D, T> SackLike<C, D, BTreeBackedSack<C, D,T>> for BTreeBackedSack<C, D, 
 }
 
 
-impl<S1, S2, S3, C1, C2, C3, D1, D2, D3, B1, B2, B3, T1, T2, T3> Decayer<S1, S2, S3, C1, C2, C3, D1, D2, D3, B1, B2, B3, T1, T2, T3>
-    for (S1,S2,S3)
-    where S1: SackLike<C1, D1, B1>,
-          S2: SackLike<C2, D2, B2>,
-          S3: SackLike<C3, D3, B3>,
+impl<'a, S1:'a, S2:'a, S3:'a, C1:'a, C2:'a, C3:'a, D1:'a, D2:'a, D3:'a, B1:'a, B2:'a, B3:'a, T1:'a, T2:'a, T3:'a> Decayer<'a, S1, S2, S3, C1, C2, C3, D1, D2, D3, B1, B2, B3, T1, T2, T3> for (S1, S2, S3)
+    where S1: SackLike<'a, C1, D1, B1>,
+          S2: SackLike<'a, C2, D2, B2>,
+          S3: SackLike<'a, C3, D3, B3>,
           C1: SackStorable,
           C2: SackStorable,
           C3: SackStorable,
@@ -64,16 +67,16 @@ impl<S1, S2, S3, C1, C2, C3, D1, D2, D3, B1, B2, B3, T1, T2, T3> Decayer<S1, S2,
           T2: TokenLike,
           T3: TokenLike
 {
-    fn decay<'a>(_s1: &'a S1) -> (&'a S2, &'a S3) {
+    fn decay(_s1: &'a S1) -> (&'a S2, &'a S3) {
         unimplemented!()
     }
 }
 
-impl<S1, S2, C1, C2, D1, D2, B1, B2, T1, T2> Emitter<S1, S2, C1, C2, D1, D2, B1, B2, T1, T2> for S1
+impl<'a, S1: 'a, S2: 'a, C1: 'a, C2: 'a, D1: 'a, D2: 'a, B1: 'a, B2: 'a, T1: 'a, T2: 'a> Emitter<'a, S1, S2, C1, C2, D1, D2, B1, B2, T1, T2> for S1
     where T1: Default,
-          S1: SackLike<C1, D1, B1>,
-          S2: SackLike<C2, D2, B2>,
-          S1: Decayer<S1, S1, S2, C1, C1, C2, D1, D1, D2, B1, B1, B2, T1, T1, T2>,
+          S1: SackLike<'a, C1, D1, B1>,
+          S2: SackLike<'a, C2, D2, B2>,
+          S1: Decayer<'a, S1, S1, S2, C1, C1, C2, D1, D1, D2, B1, B1, B2, T1, T1, T2>,
           C1: SackStorable,
           C2: SackStorable,
           D1: SackStorable,
@@ -83,34 +86,34 @@ impl<S1, S2, C1, C2, D1, D2, B1, B2, T1, T2> Emitter<S1, S2, C1, C2, D1, D2, B1,
           T1: TokenLike,
           T2: TokenLike
 {
-    fn emit<'a>(_s1: &'a S1) -> (&'a S1, &'a S2) {
+    fn emit(_s1: &'a S1) -> (&'a S1, &'a S2) {
         unimplemented!()
     }
 }
 
-impl<S1,S2,S3,S4,C1, C2, C3, C4, D1, D2, D3, D4, B1, B2, B3, B4, T1, T2, T3, T4>
-Collider<S1,S2,S3,S4,C1, C2, C3,C4,D1,D2,D3,D4,B1,B2,B3,B4,T1,T2,T3,T4> for (C1, C2, C3, C4, D1, D2, D3, D4, B1, B2, B3, B4, T1, T2, T3, T4) {
-    fn collide<'a>(_s1: &'a SackLike<C1,D1,B1>, _s2: &'a SackLike<C2,D2,B2>) -> (&'a SackLike<C3,D3,B3>, &'a SackLike<C4,D4,B4>) {
+impl<'a, C1, C2, C3, C4, D1, D2, D3, D4, B1, B2, B3, B4, T1, T2, T3, T4> Collider<'a, C1, C2, C3, C4, D1, D2, D3, D4, B1, B2, B3, B4, T1, T2, T3, T4>
+    for (C1, C2, C3, C4, D1, D2, D3, D4, B1, B2, B3, B4, T1, T2, T3, T4) {
+    fn collide(_s1: &'a SackLike<C1, D1, B1>, _s2: &'a SackLike<C2, D2, B2>) -> (&'a SackLike<'a, C3, D3, B3>, &'a SackLike<'a, C4, D4, B4>) {
         unimplemented!()
     }
 }
 
-impl<C, T> SetStore<BTreeBackedSack<C, (), T>,C, T> for BTreeBackedSack<C, (), T>
+impl<'a, C: 'a, T: 'a> SetStore<'a, BTreeBackedSack<C, (), T>, C, T> for BTreeBackedSack<C, (), T>
     where T: TokenLike + Default,
-          C: SackBacker + SackStorable + Default+Ord
+          C: SackBacker + SackStorable + Default + Ord
 {
-    fn insert(s: BTreeBackedSack<C,(),T>, value: C) -> BTreeBackedSack<C,(),T> {
-        let mut b = s.b;
-        b.insert(value, ());
-        BTreeBackedSack{t:s.t,b:b}
+    fn insert(&'a mut self, value: C) -> &'a Self {
+        //  let (mut b,t) = (self.b,self.t);
+        self.b.insert(value, ());
+        self
     }
 }
 
 impl<C, D, T> Default for BTreeBackedSack<C, D, T>
     where T: Default,
-          C: Default+Ord
+          C: Default + Ord
 {
-    fn default() -> BTreeBackedSack<C,D,T> {
+    fn default() -> BTreeBackedSack<C, D, T> {
         BTreeBackedSack {
             t: T::default(),
             b: BTreeMap::new(),

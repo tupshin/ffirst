@@ -1,12 +1,12 @@
-use std::collections::BTreeMap;
 use sack::{SackLike, SackStorable, TokenLike, SackBacker};
+use std::collections::BTreeMap;
 
-pub trait SetStore<S1, C1, T1>: Clone+Default
-    where S1: SackLike<C1, (), C1>,
+pub trait SetStore<'a, S1: 'a, C1: 'a, T1: 'a>: Clone + Default
+    where S1: SackLike<'a, C1, (), C1>,
           C1: SackStorable + SackBacker,
           T1: TokenLike
 {
-    fn insert(s1: S1, value: C1) -> S1;
+    fn insert(&'a mut self, value: C1) -> &'a Self;
 }
 
 #[derive(Clone)]
